@@ -15,6 +15,9 @@ char **output_lines = nullptr;
 int output_count = 0;
 int selected_line = 0;
 
+/**
+ * Initialize buffers for future use
+ */
 void init_api() {
   command = (char *)calloc(512, sizeof(char));
   arguments = (char *)calloc(512, sizeof(char));
@@ -23,6 +26,10 @@ void init_api() {
   sprintf(directory, "./");
 }
 
+/**
+ * Runs command: find --help
+ * Output printed in commands window
+ */
 void print_help() {
   FILE *fp = popen("find --help", "r");
   char line[1024];
@@ -32,6 +39,12 @@ void print_help() {
   pclose(fp);
 }
 
+/**
+ * Update buffer data with pre defined prompts
+ * 
+ * @param name name that will show in pre defined prompts
+ * @param buffer pointer to buffer that will be modificated
+ */
 void buffer_input(const char *name, char **buffer) {
   print_text_r("Current %s: %s\n", name, *buffer);
   print_text_colored(PAIR_RED, "Keep existing(y,n)?");
@@ -45,6 +58,9 @@ void buffer_input(const char *name, char **buffer) {
   }
 }
 
+/**
+ * Print output after running find with user defined data in list window
+ */
 void draw_output() {
   wclear(getlistscr());
   int start_pos = (selected_line / getmax()) * getmax();
@@ -57,6 +73,9 @@ void draw_output() {
   wrefresh(getlistscr());
 }
 
+/**
+ * Running find with user defined data and show output using draw_output method
+ */
 void refresh_output() {
   selected_line = 0;
   for (int i = 0; i < output_count; i++) {
@@ -79,6 +98,11 @@ void refresh_output() {
   draw_output();
 }
 
+/**
+ * Prepare find command based on pattern
+ * 
+ * @param pattern search pattern
+ */
 void search(char *pattern) {
   free(command);
   command = (char *)calloc(512, sizeof(char));
@@ -86,6 +110,9 @@ void search(char *pattern) {
   refresh_output();
 }
 
+/**
+ * Ask user to write search pattern
+ */
 void input_bar() {
   print_text_r("Pattern: ");
   char input[80];
@@ -94,6 +121,11 @@ void input_bar() {
   search(input);
 }
 
+/**
+ * Run wl-copy to copy data to clipboardd
+ * 
+ * @param text text that will be copied to clipboard
+ */
 void copy_to_clipboard(const char *text) {
   char *wlcopy = (char *)calloc(512, sizeof(char));
   sprintf(wlcopy, "echo '%s' | wl-copy", text);
@@ -101,6 +133,11 @@ void copy_to_clipboard(const char *text) {
   free(wlcopy);
 }
 
+/**
+ * Copy path if exist and after that call function copy_to_clipboard
+ * 
+ * @param relative copy relative path instead of absolute
+ */
 void copy_path(bool relative) {
   if(selected_line >= output_count || selected_line < 0)
     return;
@@ -114,7 +151,11 @@ void copy_path(bool relative) {
   print_text_colored(PAIR_RED, "Copied to clipboard\n");
 }
 
-
+/**
+ * Main method that used for keyboard interaction
+ * 
+ * @return is user pressed ESC to close program
+ */
 bool main_loop() {
   const int key = getch();
   wclear(getscr());

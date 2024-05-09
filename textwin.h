@@ -10,10 +10,22 @@ WINDOW *scr;
 WINDOW *list_scr;
 int max_per_page;
 
+/**
+ * @return command window
+ */
 WINDOW *getscr() { return scr; }
+/**
+ * @return list window
+ */
 WINDOW *getlistscr() { return list_scr; }
+/**
+ * @return max lines that list window can show
+ */
 int getmax() { return max_per_page; }
 
+/**
+ * Initialize windows
+ */
 void init_win() {
   initscr();
   noecho();
@@ -57,8 +69,17 @@ void init_win() {
   max_per_page = rows - 3;
 }
 
+/**
+ * Destroy all windows
+ */
 void stop() { endwin(); }
 
+/**
+ * Print text and refresh window
+ * 
+ * @param fmt format string
+ * @param ... data that must be formatted
+ */
 void print_text_r(const char *fmt, ...) {
   va_list args;
   va_start(args, fmt);
@@ -67,6 +88,12 @@ void print_text_r(const char *fmt, ...) {
   va_end(args);
 }
 
+/**
+ * Print text without refreshing window
+ * 
+ * @param fmt format string
+ * @param ... data that must be formatted
+ */
 void print_text_nr(const char *fmt, ...) {
   va_list args;
   va_start(args, fmt);
@@ -74,8 +101,18 @@ void print_text_nr(const char *fmt, ...) {
   va_end(args);
 }
 
+/**
+ * Refresh command window
+ */
 void refresh_win() { wrefresh(getscr()); }
 
+/**
+ * Print colored text and refresh window
+ * 
+ * @param color what color must be used, use macro PAIR_
+ * @param fmt format string
+ * @param ... data that must be formatted
+ */
 void print_text_colored(int color, const char *fmt, ...) {
   va_list args;
   va_start(args, fmt);
@@ -86,6 +123,12 @@ void print_text_colored(int color, const char *fmt, ...) {
   va_end(args);
 }
 
+/**
+ * Main loop that listen for keyboard input, fill buffer with data and show result in window
+ * 
+ * @param buffer buffer that must be filled
+ * @param max size of buffer
+ */
 void get_text(char *buffer, int max) {
   int current_pos = 0;
   while (true) {
